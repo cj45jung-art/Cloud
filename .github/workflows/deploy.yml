@@ -46,8 +46,9 @@ jobs:
           host: ${{ secrets.PUBLIC_HOST }}      # 변수 설정. secrets는 github 저장소의 Settings > Secrets and variables > Actions에서 등록한 값들을 가져오는 방법
           username: ${{ secrets.PUBLIC_USER }}  # 사용자명도 보통 root나 ubuntu 같은걸 넣어주면 됨
           key: ${{ secrets.PUBLIC_SSH_KEY }}    # SSH 키는 보통 id_rsa 형식의 개인키를 넣어주면 됨. 공개키는 Public 서버의 ~/.ssh/authorized_keys에 등록되어 있어야 함
+          # -p 옵션은 이미 폴더가 존재해도 에러 안나게 해주는 옵션
           script: |                                          
-            sudo mkdir -p "/usr/share/nginx/html"       # -p 옵션은 이미 폴더가 존재해도 에러 안나게 해주는 옵션
+            sudo mkdir -p "/usr/share/nginx/html"       
             sudo chown -R $USER:$USER "/usr/share/nginx/html" || true
 
       # (4) dist를 Public 서버 Nginx root로 업로드
