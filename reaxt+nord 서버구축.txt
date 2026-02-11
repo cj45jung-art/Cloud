@@ -1,0 +1,368 @@
+React + Nord폴더
+
+Nord
+React + Nord폴더에->server폴더 생성
+   server 폴더 터미널에서 (cd server) 
+          npm init -y
+          npm i express
+          nodemon server 서버 실행
+
+   server폴더안에 --> server.js 파일 생성후 안에 
+-------server.js----------------
+const express = require('express')
+const app = express()
+
+app.set('port', process.env.PORT || 3000)
+app.listen(app.get('port'), ()=>{
+    console.log(`${app.get('port')}번 포트에서 대기 중...`)
+})
+-------------------------
+   server폴더안에 -->  routes폴더 생성
+       routes폴더안에 --> index.js 파일 생성후 안에
+------index.js---------------------
+const express = require('express')
+const router = express.Router()
+
+// 메인 페이지
+router.get('/', (req,res)=>{
+    console.log('서버 접근!')
+})
+
+module.exports = router; 
+------server.js-----------------------------
+const express = require('express')
+const app = express()
+
+app.set('port', process.env.PORT || 3000)
+app.listen(app.get('port'), ()=>{
+    console.log(`${app.get('port')}번 포트에서 대기 중...`)
+})
+
+========터미널 창 하나더 열기 react용=========
+1. split terminal을 이용해서 
+터미널 나누고 
+
+2. 터미널에 입력
+cd ..
+npm create vite@latest client
+React
+Javascript
+No
+Yes
+  
+  React + Nord폴더안에 --> client 폴더 생성( 처음 만든 server 폴더와 동일한 형제 위치)
+--------------------------------------------------------
+오른쪽 react터미널 에서 ctrl+c로 터미널 끄고
+    npm run build    실행 하면
+
+왼쪽 폴더리스트 client 폴더안에 --> dist폴더 생성
+--------------server.js 에 코드 추가--------------------
+const express = require('express')
+const app = express()
+
+const indexRouter = require('./routes/index')
+const path = require('path')
+
+// npm run build 를 통해 React 프로젝트를
+// 하나의 index.html 로 만들었음
+//  => 그 파일을 키기 위해 정적인 파일을 담당하는 코드 
+app.use(express.static(path.join('../client/dist')))
+
+app.use('/', indexRouter)
+
+app.set('port', process.env.PORT || 3000)
+app.listen(app.get('port'), ()=>{
+    console.log(`${app.get('port')}번 포트에서 대기 중...`)
+})
+
+-----src폴더 안-->App.jsx 파일 --------------
+내용 모두 지우고
+
+function App() {
+
+  return (
+    <>
+      <h1>App</h1>
+    </>
+  )
+}
+
+export default App
+
+-----src폴더 안-->main.jsx 파일 내용 정리(4줄 삭제)----------
+import { createRoot } from 'react-dom/client'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+    <App />
+)
+
+
+-------App.js파일 1-----------------------
+function App() {
+
+  return (
+    <>
+      <h1>
+        <p>Client에서 Server로 데이터 전송하기</p>
+        <input type="text"></input>
+        <button>전송</button>
+        <hr/>
+        <p>Server에서 Client로 넘어온 데이터</p>
+        <p>어쩌구저쩌구</p>
+      </h1>
+    </>
+  )
+}
+
+export default App
+
+
+-------App.js파일 2-----------------------
+import { useState } from "react"
+
+function App() {
+
+  const [data, setData] = useState('')
+  const sendToServer = ()=>{
+    console.log('sendToServer')
+  }
+
+  return (
+    <>
+      <h1>
+        <p>Client에서 Server로 데이터 전송하기</p>
+        <input type="text"></input>
+        <button onClick={sendToServer}>전송</button>
+        <hr/>
+        <p>Server에서 Client로 넘어온 데이터</p>
+        <p>어쩌구저쩌구</p>
+      </h1>
+    </>
+  )
+}
+
+export default App
+
+
+-------App.js파일 3-----------------------
+import { useState } from "react"
+
+function App() {
+
+  const [data, setData] = useState('')
+  const sendToServer = ()=>{
+    console.log('sendToServer', data)
+  }
+
+  return (
+    <>
+      <h1>
+        <p>Client에서 Server로 데이터 전송하기</p>
+        <input type="text" onChange={(e)=>{setData(e.target.value)}}></input>
+        <button onClick={sendToServer}>전송</button>
+        <hr/>
+        <p>Server에서 Client로 넘어온 데이터</p>
+        <p>어쩌구저쩌구</p>
+      </h1>
+    </>
+  )
+}
+
+export default App
+
+
+=====오른쪽 react터미널======================
+ctrl+c 로 터미널 끄고 client 폴더에 axios설치
+       npm i axios
+       npm run dev
+
+--------App.js파일--------------------
+import { useState } from "react"
+import axios from 'axios'
+
+function App() {
+
+  const [data, setData] = useState('')
+  const sendToServer = ()=>{
+    console.log('sendToServer', data)
+
+    // front 데이터를 server로 전송 
+    axios.post('http://localhost:3000/getData', {
+      data : data
+    })
+  }
+
+  return (
+    <>
+      <h1>
+        <p>Client에서 Server로 데이터 전송하기</p>
+        <input type="text" onChange={(e)=>{setData(e.target.value)}}></input>
+        <button onClick={sendToServer}>전송</button>
+        <hr/>
+        <p>Server에서 Client로 넘어온 데이터</p>
+        <p>어쩌구저쩌구</p>
+      </h1>
+    </>
+  )
+}
+
+export default App
+
+--------index.js 파일에 추가----------------------------
+// 데이터 받아올 부분 
+router.post('/getData', (req,res)=>{
+    console.log('getData Router')
+})
+
+--------server.js 파일에 추가----------------------------
+// post 방식 데이터를 주고받을 때 필요한 미들웨어 
+app.use(express.urlencoded({extended : true}))
+
+
+--------index.js 파일에 추가----------------------------
+    // 요청에 대한 응답을 프론트로 
+    res.json({status : 200, nick : '선영표'})
+
+
+-------App.js 파일에 추가--------------------------
+import { useState } from "react"
+import axios from 'axios'
+
+function App() {
+
+  const [data, setData] = useState('')
+  const [obj, setObj] = useState({})
+
+  const sendToServer = ()=>{
+    console.log('sendToServer', data)
+
+    // front 데이터를 server로 전송 
+    axios.post('http://localhost:3000/getData', {
+      data : data
+    }).then(res => {
+      console.log('res', res.data)
+      setObj(res.data)
+    })
+  }
+  return (
+    <>
+      <h1>
+        <p>Client에서 Server로 데이터 전송하기</p>
+        <input type="text" onChange={(e)=>{setData(e.target.value)}}></input>
+        <button onClick={sendToServer}>전송</button>
+        <hr/>
+        <p>Server에서 Client로 넘어온 데이터</p>
+        <p>어쩌구저쩌구</p>
+      </h1>
+    </>
+  )
+}
+
+export default App
+
+======================================
+1. server 폴더로 이동해서--> config 폴더 생성 
+
+2. config 폴더 안에 --> database.js 파일 생성
+
+3. database.js 파일 안에 카톡으로 준거 복붙 ------------
+
+const mysql = require('mysql2')
+
+// 3) DB 정보 기재 
+const conn = mysql.createConnection({
+    host : 'localhost',
+    user : 'root',
+    password : '1234', 
+    port : 3306,
+    database : 'NODEJS'
+})
+
+conn.connect()
+module.exports = conn;
+
+---------------------------------------------------------------
+4. 왼쪽 노드 터미널 에서 CTRL+ CC 끄고  
+
+\React+Node\server> server폴더 위치에서 mysql2 설치
+
+5. 터미널에 입력
+npm i mysql2
+nodemon server.js
+
+==========Workbench 실행===================
+
+CREATE TABLE DATA_TABLE (
+   NICK VARCHAR(100)
+); 
+
+SELECT *
+  FROM DATA_TABLE;
+
+
+
+INSERT INTO DATA_TABLE VALUES ('1'); 
+
+
+-----------index.js 파일에추가 데이터 입력----------------
+ "   // nick 데이터를 DB에 넣어보자! 
+    let sql =  "INSERT INTO DATA_TABLE VALUES (?)"
+    
+    conn.query(sql, [req.body.data], (err,rows)=>{
+        console.log('rows', rows)
+    })  " 
+
+------종합편-----------------------------
+
+const express = require('express')
+const router = express.Router()
+const path = require('path')
+const conn = require('../config/database')
+
+// 메인 페이지
+router.get('/', (req,res)=>{
+    console.log('서버 접근!')
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+})
+
+// 데이터 받아올 부분 
+router.post('/getData', (req,res)=>{
+    console.log('getData Router', req.body)
+
+    // nick 데이터를 DB에 넣어보자! 
+    let sql =  "INSERT INTO DATA_TABLE VALUES (?)"
+    
+    conn.query(sql, [req.body.data], (err,rows)=>{
+        console.log('rows', rows)
+        if (rows) {
+            // 요청에 대한 응답을 프론트로 
+            res.json({status : 200, nick : '선영표'})
+        } else {
+            res.json({status : 500})
+        }
+    })
+
+
+
+})
+
+module.exports = router;
+
+
+
+------입력하고 최종적으로 workbench에서 입력된 데이터 리스트 확인-----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
